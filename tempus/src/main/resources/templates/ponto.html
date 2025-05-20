@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Ponto</title>
+</head>
+<body>
+    <h1>Olá, <span th:text="${usuario.nome}">Usuário</span>!</h1>
+
+    <form th:action="@{/ponto}" method="post">
+        <button type="submit">Registrar Ponto</button>
+    </form>
+
+    <h2>Registros de Ponto:</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data e Hora</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="registro : ${registros}">
+                <td th:text="${#temporals.format(registro.horario, 'dd/MM/yyyy HH:mm:ss')}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Sair</button>
+    </form>
+</body>
+</html>
