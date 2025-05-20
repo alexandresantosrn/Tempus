@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -22,27 +24,26 @@ public class PontoController {
     private final RegistroPontoRepository registroPontoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/ponto";
-    }
-
     @GetMapping("/ponto")
-    public String listarPontos(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        List<RegistroPonto> registros = registroPontoRepository.findByUsuario(usuario);
+    public String telaPonto(@AuthenticationPrincipal Usuario usuario, Model model) {
+        List<RegistroPonto> registrosDoDia = registroPontoRepository
+                .findByUsuarioAndHorarioBetween(
+                        usuario,
+                        LocalDate.now().atStartOfDay(),
+                        LocalDate.now().atTime(23, 59, 59)
+                );
+
+        String dataFormatada = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         model.addAttribute("usuario", usuario);
-        model.addAttribute("registros", registros);
+        model.addAttribute("registros", registrosDoDia);
+        model.addAttribute("dataHoje", dataFormatada);
 
         return "ponto";
     }
 
     @PostMapping("/ponto")
-    public String registrarPonto(@AuthenticationPrincipal UserDetails userDetails) {
-        Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public String registrarPonto(@AuthenticationPrincipal Usuario usuario) {
 
         RegistroPonto ponto = RegistroPonto.builder()
                 .usuario(usuario)
@@ -50,7 +51,6 @@ public class PontoController {
                 .build();
 
         registroPontoRepository.save(ponto);
-
         return "redirect:/ponto";
     }
 }

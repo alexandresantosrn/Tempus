@@ -2,31 +2,30 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Ponto</title>
+    <title>Ponto Eletrônico</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
 </head>
 <body>
-    <h1>Olá, <span th:text="${usuario.nome}">Usuário</span>!</h1>
+    <header>
+        <h1>Olá, <span th:text="${usuario.nome}">Usuário</span>!</h1>
+        <p>Data de hoje: <span th:text="${dataHoje}">--/--/----</span></p>
+    </header>
 
-    <form th:action="@{/ponto}" method="post">
-        <button type="submit">Registrar Ponto</button>
-    </form>
+    <main>
+        <h2>Registros de ponto de hoje</h2>
+        <ul>
+            <li th:each="registro : ${registros}">
+                <span th:text="${#dates.format(registro.horario, 'HH:mm:ss')}">Hora</span>
+            </li>
+        </ul>
 
-    <h2>Registros de Ponto:</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Data e Hora</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="registro : ${registros}">
-                <td th:text="${#temporals.format(registro.horario, 'dd/MM/yyyy HH:mm:ss')}"></td>
-            </tr>
-        </tbody>
-    </table>
+        <form method="post" th:action="@{/ponto}">
+            <button type="submit">Registrar Ponto</button>
+        </form>
+    </main>
 
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">Sair</button>
-    </form>
+    <footer>
+        <a href="/logout">Sair</a>
+    </footer>
 </body>
 </html>
