@@ -15,7 +15,7 @@
         <h2>Registros de ponto de hoje</h2>
         <ul>
             <li th:each="registro : ${registros}">
-                <span th:text="${#dates.format(registro.horario, 'HH:mm:ss')}">Hora</span>
+                <span th:text="${registro.horarioFormatado}">Horário</span>
             </li>
         </ul>
 

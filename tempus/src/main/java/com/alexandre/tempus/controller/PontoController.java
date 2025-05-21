@@ -1,5 +1,6 @@
 package com.alexandre.tempus.controller;
 
+import com.alexandre.tempus.dto.RegistroPontoDTO;
 import com.alexandre.tempus.model.RegistroPonto;
 import com.alexandre.tempus.model.Usuario;
 import com.alexandre.tempus.repository.RegistroPontoRepository;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,17 +28,22 @@ public class PontoController {
 
     @GetMapping("/ponto")
     public String telaPonto(@AuthenticationPrincipal Usuario usuario, Model model) {
-        List<RegistroPonto> registrosDoDia = registroPontoRepository
-                .findByUsuarioAndHorarioBetween(
-                        usuario,
-                        LocalDate.now().atStartOfDay(),
-                        LocalDate.now().atTime(23, 59, 59)
-                );
+        List<RegistroPonto> registros = registroPontoRepository
+            .findByUsuarioAndHorarioBetween(
+                    usuario,
+                    LocalDate.now().atStartOfDay(),
+                    LocalDate.now().atTime(23, 59, 59)
+            );
+
+        // Converte registros para DTOs formatados
+        List<RegistroPontoDTO> registrosDTO = registros.stream()
+                .map(r -> new RegistroPontoDTO(r.getHorario()))
+                .toList();
 
         String dataFormatada = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         model.addAttribute("usuario", usuario);
-        model.addAttribute("registros", registrosDoDia);
+        model.addAttribute("registros", registrosDTO);
         model.addAttribute("dataHoje", dataFormatada);
 
         return "ponto";
